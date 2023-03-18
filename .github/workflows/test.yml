@@ -13,22 +13,23 @@ jobs:
     name: Foundry project
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
         with:
           submodules: recursive
 
-      - name: Install Foundry
+      - name: Install Foundry 🏗️
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
 
-      - name: Run Forge build
+      - name: Run Forge build 🚀
         run: |
           forge --version
           forge build --sizes
         id: build
 
-      - name: Run Forge tests
+      - name: Run Forge tests 🧪
         run: |
           forge test -vvv
         id: test
