@@ -1,23 +1,16 @@
 {
-  "name": "task-list",
+  "name": "frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "assert": "^2.0.0",
-    "ethers": "^6.1.0",
-    "fs": "^0.0.1-security",
-    "net": "^1.0.2",
-    "node-gyp-build": "^4.6.0",
+    "ethers": "^5.7.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
-    "stream-browserify": "^3.0.0",
-    "tls": "^0.0.1",
-    "web-vitals": "^2.1.4",
-    "websocket": "^1.0.34"
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -42,8 +35,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "browserify-zlib": "^0.2.0"
   }
 }
