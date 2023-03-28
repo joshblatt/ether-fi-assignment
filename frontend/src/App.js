@@ -65,13 +65,29 @@ function App() {
     }
   }
 
+  function dateToTimestamp(date) {
+    const timestamp = Math.floor(new Date(date).getTime() / 1000);
+    console.log(timestamp);
+    return timestamp;
+  }
+
   async function handleCreateTask(e) {
     e.preventDefault();
-    const overrides = { gasLimit: 1000000 };
-    await contract.createTask(name, description, dueDate, overrides);
+    // const overrides = { gasLimit: 1000000 };
+    try {
+      const contractWithSigner = contract.connect(provider.getSigner());
+      console.log(await contractWithSigner.createTask(name, description, dueDate));
+      // await contract.createTask(name, description, dueDate);
+      // await contract.methods.createTask(name, description, dueDate).send({from: address})
+      console.log("no error");
+    } catch (error) {
+      console.error(error);
+    }
+
     setName("");
     setDescription("");
     setDueDate("");
+    console.log("task creation complete")
   }
 
   async function handleMarkAsComplete(index) {
@@ -132,7 +148,7 @@ function App() {
                       type="date"
                       name="dueDate"
                       value={dueDate}
-                      onChange={(e) => setDueDate(e.target.value)}
+                      onChange={(e) => setDueDate(dateToTimestamp(e.target.value))}
                     />
                   </label>
                   <button type="submit">Create Task</button>
