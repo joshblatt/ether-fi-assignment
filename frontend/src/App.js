@@ -31,32 +31,6 @@ function App() {
     checkMetamaskAvailability();
   }, []);
 
-  useEffect(() => {
-    async function setup() {
-      if (window.ethereum) {
-        const contractAddress = "0xB4D9E311B49eEbf332a6248f49C2f34224D5aE99";
-        const contract = new ethers.Contract(
-          contractAddress,
-          TaskListContract.abi,
-          provider.getSigner()
-        );
-        setContract(contract);
-        const isAdmin = await contract.isAdmin();
-        setIsAdmin(isAdmin);
-        if (isAdmin) {
-          const adminArray = await contract.getAdminList();
-          setAdminList(adminArray);
-        }
-        console.log("setup complete");
-      }
-    }
-    if (isConnected && !isSetup) {
-      setup();
-      setIsSetup(true);
-    }
-    setIsSetup(false);
-  }, []);
-
   const connectWallet = async () => {
     try {
       if (!ethereum) {
@@ -67,10 +41,29 @@ function App() {
       });
       setAccountAddress(accounts[0]);
       setIsConnected(true);
+      setup();
     } catch (error) {
       setIsConnected(false);
     }
   };
+
+  const setup = async() => {
+    if (window.ethereum) {
+      const contractAddress = "0x428A37f6a5f864C84bC933AB6eF999A8d358b363";
+      const contract = new ethers.Contract(
+        contractAddress,
+        TaskListContract.abi,
+        provider.getSigner()
+      );
+      setContract(contract);
+      const isAdmin = await contract.isAdmin();
+      setIsAdmin(isAdmin);
+      if (isAdmin) {
+        const adminArray = accountAddress;
+        setAdminList(adminArray);
+      }
+    }
+  }
 
   async function handleCreateTask(e) {
     e.preventDefault();
