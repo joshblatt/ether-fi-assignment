@@ -1,6 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ethers } from 'ethers';
 import TaskListContract from './contracts/TaskList.json'
+
+export const useInterval = (callback, delay) => {
+
+  const savedCallback = useRef();
+
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+
+  useEffect(() => {
+    function tick() {
+      savedCallback.current();
+    }
+    if (delay !== null) {
+      const id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
+}
 
 function App() {
   const [haveMetamask, sethaveMetamask] = useState(true);
@@ -30,6 +50,12 @@ function App() {
     };
     checkMetamaskAvailability();
   }, []);
+
+  useInterval(() => {
+    if (isConnected) {
+      updateTaskList();
+    }
+  }, [10 * 1000]);
 
   const connectWallet = async () => {
     try {
@@ -67,37 +93,59 @@ function App() {
 
   function dateToTimestamp(date) {
     const timestamp = Math.floor(new Date(date).getTime() / 1000);
-    console.log(timestamp);
     return timestamp;
+  }
+
+  function timestampToDate(timestamp) {
+    const date = new Date(timestamp * 1000);
+    return date;
   }
 
   async function handleCreateTask(e) {
     e.preventDefault();
-    // const overrides = { gasLimit: 1000000 };
     try {
       const contractWithSigner = contract.connect(provider.getSigner());
-      console.log(await contractWithSigner.createTask(name, description, dueDate));
-      // await contract.createTask(name, description, dueDate);
-      // await contract.methods.createTask(name, description, dueDate).send({from: address})
-      console.log("no error");
+      await contractWithSigner.createTask(name, description, dateToTimestamp(dueDate));
     } catch (error) {
       console.error(error);
     }
-
     setName("");
     setDescription("");
     setDueDate("");
-    console.log("task creation complete")
+    updateTaskList();
+  }
+
+  async function updateTaskList() {
+    try {
+      var blockchainTasks = await contract.getTasks();
+      // blockchainTasks.sort(function(a, b) {
+      //   return parseInt(a.dueDate) - parseInt(b.dueDate);
+      // });
+      console.log(blockchainTasks);
+      setTasks(blockchainTasks);
+    } catch (error) {
+      console.log(error);
+    }
+
   }
 
   async function handleMarkAsComplete(index) {
-    const overrides = { gasLimit: 1000000 };
-    await contract.markTaskAsComplete(index, overrides);
+    try {
+      const contractWithSigner = contract.connect(provider.getSigner());
+      await contractWithSigner.markTaskAsComplete(index);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async function handleRemove(index) {
-    const overrides = { gasLimit: 1000000 };
-    await contract.removeTask(index, overrides);
+    try {
+      const contractWithSigner = contract.connect(provider.getSigner());
+      await contractWithSigner.removeTask(index);
+    } catch (error) {
+      console.log(error);
+    }
+
   }
 
   return (
@@ -148,7 +196,7 @@ function App() {
                       type="date"
                       name="dueDate"
                       value={dueDate}
-                      onChange={(e) => setDueDate(dateToTimestamp(e.target.value))}
+                      onChange={(e) => setDueDate(e.target.value)}
                     />
                   </label>
                   <button type="submit">Create Task</button>
@@ -166,7 +214,6 @@ function App() {
                   </thead>
                   <tbody>
                     {tasks
-                      .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
                       .map((task, index) => (
                         <tr key={index}>
                           <td>{task.name}</td>
