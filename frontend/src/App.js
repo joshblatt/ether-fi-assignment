@@ -55,7 +55,7 @@ function App() {
     if (isConnected) {
       updateTaskList();
     }
-  }, [10 * 1000]);
+  }, [1 * 1000]);
 
   const connectWallet = async () => {
     try {
@@ -118,10 +118,9 @@ function App() {
   async function updateTaskList() {
     try {
       var blockchainTasks = await contract.getTasks();
-      // blockchainTasks.sort(function(a, b) {
-      //   return parseInt(a.dueDate) - parseInt(b.dueDate);
-      // });
-      console.log(blockchainTasks);
+      // console.log(taskList);
+      blockchainTasks = blockchainTasks.slice().sort((a,b) => a.dueDate.toNumber() > b.dueDate.toNumber());
+      // console.log(taskList);
       setTasks(blockchainTasks);
     } catch (error) {
       console.log(error);
@@ -218,7 +217,7 @@ function App() {
                         <tr key={index}>
                           <td>{task.name}</td>
                           <td>{task.description}</td>
-                          <td>{task.dueDate}</td>
+                          <td>{timestampToDate(task.dueDate.toNumber()).toString()}</td>
                           <td>
                             {!task.completed && (
                               <button onClick={() => handleMarkAsComplete(index)}>
